@@ -13,7 +13,7 @@
 ## intel compiler
 module load compilers/intel/2019u5 
 
-conda activate codegrade
+conda activate test
 
 % for c in commands:
 ${c}

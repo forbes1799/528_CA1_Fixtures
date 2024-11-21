@@ -33,7 +33,7 @@ def run(basedir, num_threads, executable, identifier, results_file):
 
     e_full_path = os.path.join(basedir, e)
 
-    runtime = run_executable(e_full_path, args, num_threads, num_runs=3)
+    runtime = run_executable(e_full_path, args, num_threads, num_runs=1)
     if runtime is None:
         print("Provided command is erroring out. Timings are meaningless. Moving on...")
         sys.exit(-1)

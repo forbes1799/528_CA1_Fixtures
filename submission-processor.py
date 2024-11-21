@@ -4,8 +4,8 @@ import os
 from slurm import submit_slurm_job
 from executor import run_command
 
-executables = [{'compile_command': "make comp", 'name': "comp", 'args': ['{artifacts_path}/4096_coords.coord', '{artifacts_path}/cout.dat']},
-               {'compile_command': "make fomp", 'name': "fomp", 'args': ['{artifacts_path}/4096_coords.coord', '{artifacts_path}/fout.dat']}]
+executables = [{'compile_command': "make gccomp", 'name': "gccomp", 'args': ['{basedir}/asteroids_train.csv', '{basedir}asteroids_test.csv', '{basedir}sout.csv', '3']},
+               {'compile_command': "make iccomp", 'name': "iccomp", 'args': ['{basedir}/asteroids_train.csv', '{basedir}asteroids_test.csv', '{basedir}sout.csv', '3']}]
 
 
 def compile(basedir, artifacts_path):
@@ -14,7 +14,7 @@ def compile(basedir, artifacts_path):
     for exe in executables:
         command = exe['compile_command']
         e = exe["name"]
-        command = command.format_map({'artifacts_path': artifacts_path})
+        command = command.format_map({'basedir' : basedir})
         output_file_name = "%s_compilation.out" % e
         output_file_path = os.path.join(basedir, output_file_name)
         p = run_command(command, cwd=basedir, output_file=output_file_path)
@@ -28,7 +28,7 @@ def compile(basedir, artifacts_path):
 
 
 def submit_job_for_run(exe, num_threads, identifier, artifacts_path, basedir):
-    args = [x.format_map({'artifacts_path': artifacts_path}) for x in exe["args"]]
+    args = [x.format_map({'basedir': basedir}) for x in exe["args"]]
     results_file_name = os.path.join(basedir, "iresults.csv")
     command_to_run = ["python", os.path.join(artifacts_path, "single-instance-runner.py")]
     command_to_run += ["--num-threads", str(num_threads)]
@@ -39,7 +39,7 @@ def submit_job_for_run(exe, num_threads, identifier, artifacts_path, basedir):
     command_to_run = " ".join(command_to_run)
     slurm_template = os.path.join(artifacts_path, "slurm_template.tpl")
     return submit_slurm_job([command_to_run], slurm_template, cwd=basedir,
-                            time_limit=60, num_cores=num_threads)
+                            time_limit=20, num_cores=num_threads)
 
 @click.command()
 @click.option('--basedir', default=None, help='Directory to find executables')
